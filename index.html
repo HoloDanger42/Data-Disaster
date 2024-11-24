@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Disasters</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+      rel="stylesheet"
+    />
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+      <div class="container">
+        <span class="navbar-brand">Data Disasters</span>
+      </div>
+    </nav>
+
+    <main class="container">
+      <!-- Type Coercion Section -->
+      <section id="type-coercion" class="mb-5">
+        <h2 class="section-title">1. Type Coercion: Unexpected Results</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="explanation mb-4">
+              <p class="lead">
+                JavaScript's type coercion can lead to unexpected behavior when
+                comparing or operating on different data types.
+              </p>
+            </div>
+
+            <div class="code-example mb-4">
+              <h5>Example Code:</h5>
+              <pre><code class="language-javascript">  // Loose vs Strict Equality
+  console.log(5 == "5");   // true
+  console.log(5 === "5");  // false </code></pre>
+            </div>
+
+            <div class="demo-area">
+              <section class="subsection">
+                <h5>Loose vs Strict Comparison:</h5>
+                <div class="mb-3">
+                  <label for="coercionInput1" class="form-label"
+                    >Value 1:</label
+                  >
+                  <!-- Input for Value 1 -->
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="coercionInput1"
+                    aria-label="First value for comparison"
+                    placeholder="Enter first value (e.g., 5)"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="coercionInput2" class="form-label"
+                    >Value 2:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="coercionInput2"
+                    aria-label="Second value for comparison"
+                    placeholder='Enter second value (e.g., "5")'
+                  />
+                </div>
+                <button
+                  class="btn btn-primary"
+                  id="coercionButton"
+                  aria-label="Compare values"
+                  title="Compare the two values to see type coercion in action"
+                >
+                  Compare Values
+                </button>
+                <div
+                  id="coercionResult"
+                  class="mt-3 result-area alert alert-secondary"
+                ></div>
+              </section>
+
+              <section class="subsection">
+                <h5>Arithmetic Operations:</h5>
+                <form>
+                  <div class="mb-3">
+                    <label for="arithmeticInput1" class="form-label"
+                      >Value 1:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="arithmeticInput1"
+                      aria-label="Value 1 for arithmetic operation"
+                      pattern="-?\d*\.?\d*"
+                      placeholder="Enter a number (e.g., 42.5)"
+                      title="Please enter a valid number"
+                      required
+                    />
+                    <div>
+                      <label for="arithmeticOperator" class="form-label"
+                        >Operator:</label
+                      >
+                      <select id="arithmeticOperator">
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                        <option value="*">*</option>
+                        <option value="/">/</option>
+                      </select>
+                    </div>
+                    <label for="arithmeticInput2" class="form-label"
+                      >Value 2:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="arithmeticInput2"
+                      aria-label="Value 2 for arithmetic operation"
+                      pattern="-?\d*\.?\d*"
+                      placeholder="Enter a number (e.g., 10)"
+                      title="Please enter a valid number"
+                      required
+                    />
+                  </div>
+                  <button
+                    class="btn btn-primary"
+                    id="arithmeticButton"
+                    aria-label="Perform arithmetic operation"
+                    title="Calculate numbers to demonstrate type coercion in arithmetic"
+                  >
+                    Calculate
+                  </button>
+                </form>
+                <div id="arithmeticResult" class="mt-3 result-area"></div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mutable State Section -->
+      <section id="mutable-state" class="mb-5">
+        <h2 class="section-title">2. Mutable State: Unintended Side Effects</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="explanation mb-4">
+              <p class="lead">
+                Modifying objects and arrays can lead to unexpected side effects
+                due to reference sharing.
+              </p>
+            </div>
+
+            <div class="code-example mb-4">
+              <h5>Example Code:</h5>
+              <pre><code class="language-javascript">  const originalArray = [1, 2, 3];
+  const copy = originalArray;
+  copy.push(4);
+  // originalArray is also modified! </code></pre>
+            </div>
+
+            <div class="demo-area">
+              <button
+                class="btn btn-primary"
+                id="mutableButton"
+                aria-label="Demonstrate array mutation"
+                title="Show how modifying a copy affects the original array"
+              >
+                Mutate Array
+              </button>
+              <pre
+                id="stateDisplay"
+                class="bg-light p-3 mt-3 result-area"
+              ></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Async Error Section -->
+      <section id="async-error" class="mb-5">
+        <h2 class="section-title">
+          3. Asynchronous Errors: Handling the Unexpected
+        </h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="explanation mb-4">
+              <p class="lead">
+                Asynchronous operations require proper error handling to prevent
+                unhandled rejections.
+              </p>
+            </div>
+
+            <div class="code-example mb-4">
+              <h5>Example Code:</h5>
+              <pre><code class="language-javascript">  async function riskyOperation() {
+    throw new Error('Something went wrong');
+  }
+  // Without proper error handling:
+  riskyOperation(); // Unhandled promise rejection! </code></pre>
+            </div>
+
+            <div class="demo-area">
+              <button
+                class="btn btn-danger"
+                id="asyncButton"
+                aria-label="Trigger asynchronous operation"
+                title="Execute an async operation that will throw an error"
+              >
+                Trigger Async Operation
+              </button>
+              <div class="results-container">
+                <div
+                  id="asyncResult"
+                  class="alert alert-info d-none mt-3"
+                ></div>
+                <div
+                  id="asyncError"
+                  class="alert alert-danger d-none mt-3"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script>
+      Prism.highlightAll();
+    </script>
+    <script src="script.js"></script>
+  </body>
+</html>
