@@ -507,16 +507,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateProgress(sectionId) {
     const progressBar = document.querySelector(".progress-bar");
-    const SECTIONS = Object.freeze({
-      TYPE_COERCION: "type-coercion",
-      MUTABLE_STATE: "mutable-state",
-      ASYNC_ERROR: "async-error",
-    });
+    const sections = ["type-coercion", "mutable-state", "async-error"];
     const currentIndex = sections.indexOf(sectionId);
-    const progress = ((currentIndex + 1) / sections.length) * 100;
 
-    progressBar.style.width = `${progress}%`;
-    progressBar.setAttribute("aria-valuenow", progress);
-    progressBar.textContent = `${currentIndex + 1}/${SECTIONS.length}`;
+    if (currentIndex !== -1) {
+      const progress = ((currentIndex + 1) / sections.length) * 100;
+
+      progressBar.style.width = `${progress}%`;
+      progressBar.setAttribute("aria-valuenow", progress);
+      progressBar.textContent = `${currentIndex + 1}/${sections.length}`;
+    }
   }
 });
