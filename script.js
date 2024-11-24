@@ -169,6 +169,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function getCoercionDemonstration(val1, val2, operator) {
+    // Show what would happen without explicit conversion
+    let nonCoercedResult;
+    try {
+      // Evaluate without Number() conversion
+      switch (operator) {
+        case "+":
+          nonCoercedResult = val1 + val2; // String concatenation
+          break;
+        case "-":
+          nonCoercedResult = val1 - val2; // Automatic number conversion
+          break;
+        case "*":
+          nonCoercedResult = val1 * val2; // Automatic number conversion
+          break;
+        case "/":
+          nonCoercedResult = val1 / val2; // Automatic number conversion
+          break;
+      }
+    } catch (e) {
+      nonCoercedResult = "Error";
+    }
+    return nonCoercedResult;
+  }
+
+  function getEnhancedExplanation(val1, val2, operator, coercedResult) {
+    const explanations = [];
+
+    if (operator === "+") {
+      explanations.push(
+        `Without explicit conversion: "${
+          val1 + val2
+        }" (string concatenation) vs 
+         With Number() conversion: ${coercedResult} (numeric addition)`
+      );
+    } else {
+      explanations.push(
+        `JavaScript automatically coerces strings to numbers for ${operator} operations.
+         The same result would occur with or without explicit Number() conversion.`
+      );
+    }
+
+    return explanations.join(" ");
+  }
+
   arithmeticForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -185,88 +230,293 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Convert to numbers immediately after validation
+    // Demonstrate coercion by showing both paths
+    const nonCoercedResult = getCoercionDemonstration(
+      originalVal1,
+      originalVal2,
+      operator
+    );
     const num1 = Number(originalVal1);
     const num2 = Number(originalVal2);
-    const hadTypeCoercion = true; // Since inputs are always strings initially
 
-    let result;
-    let explanation = "";
-
+    let coercedResult;
     try {
-      if (isNaN(num1) || isNaN(num2)) {
-        throw new Error("One or more inputs is not a valid number");
-      }
-
       switch (operator) {
         case "+":
-          result = num1 + num2;
+          coercedResult = num1 + num2;
           break;
         case "-":
-          result = num1 - num2;
+          coercedResult = num1 - num2;
           break;
         case "*":
-          result = num1 * num2;
+          coercedResult = num1 * num2;
           break;
         case "/":
-          result = num2 === 0 ? Infinity : num1 / num2;
+          coercedResult = num2 === 0 ? Infinity : num1 / num2;
           break;
         default:
           throw new Error("Invalid operator");
       }
-
-      explanation = getExplanation(
-        num1,
-        num2,
-        operator,
-        result,
-        originalVal1,
-        originalVal2
-      );
     } catch (error) {
-      result = `Error: ${error.message}`;
-      explanation = "";
+      coercedResult = `Error: ${error.message}`;
     }
 
+    const explanation = getEnhancedExplanation(
+      originalVal1,
+      originalVal2,
+      operator,
+      nonCoercedResult,
+      coercedResult
+    );
+
     arithmeticResult.innerHTML = `
-      <h5>Arithmetic Results:</h5>
+      <h5>Type Coercion Demonstration:</h5>
       <table class="table table-bordered">
         <thead>
           <tr>
+            <th>Stage</th>
             <th>Expression</th>
             <th>Result</th>
-            <th>Original Type</th>
-            <th>Computed Type</th>
+            <th>Type</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><code>Value 1</code></td>
-            <td>${originalVal1} → ${num1}</td>
-            <td><span class="badge bg-secondary">string</span></td>
-            <td><span class="badge bg-primary">number</span></td>
+          <tr class="table-warning">
+            <td>Original Input</td>
+            <td><code>${originalVal1} ${operator} ${originalVal2}</code></td>
+            <td>${nonCoercedResult}</td>
+            <td><span class="badge bg-secondary">${typeof nonCoercedResult}</span></td>
           </tr>
-          <tr>
-            <td><code>Value 2</code></td>
-            <td>${originalVal2} → ${num2}</td>
-            <td><span class="badge bg-secondary">string</span></td>
-            <td><span class="badge bg-primary">number</span></td>
-          </tr>
-          <tr>
+          <tr class="table-info">
+            <td>After Number() Conversion</td>
             <td><code>${num1} ${operator} ${num2}</code></td>
-            <td>${result}</td>
-            <td colspan="2"><span class="badge bg-secondary">${typeof result}</span></td>
+            <td>${coercedResult}</td>
+            <td><span class="badge bg-primary">${typeof coercedResult}</span></td>
           </tr>
         </tbody>
       </table>
-      ${
-        explanation
-          ? `<div class="alert alert-info mt-3">${explanation}</div>`
-          : ""
-      }
+      <div class="alert alert-info mt-3">
+        <h6>Type Coercion Explanation:</h6>
+        ${explanation}
+      </div>
     `;
-
-    const rows = arithmeticResult.querySelectorAll("tbody tr");
-    applyResultStyling(result, rows[2], hadTypeCoercion);
   });
+
+  // Mutable State Demo
+  const mutableButton = document.getElementById("mutableButton");
+  const stateDisplay = document.getElementById("stateDisplay");
+
+  class TodoList {
+    constructor(items = []) {
+      this.items = items;
+    }
+
+    // Demonstrates mutation
+    addItemMutable(item) {
+      this.items.push(item);
+      return this.items;
+    }
+
+    // Demonstrates immutable update
+    addItemImmutable(item) {
+      return new TodoList([...this.items, item]);
+    }
+  }
+
+  mutableButton.addEventListener("click", () => {
+    // Example 1: Reference Sharing
+    const originalList = new TodoList([
+      { id: 1, text: "Learn JavaScript" },
+      { id: 2, text: "Build Project" },
+    ]);
+
+    // Show original state
+    const originalState = JSON.stringify(originalList.items);
+
+    // Demonstrate reference sharing
+    const shallowCopy = originalList.items;
+    shallowCopy.push({ id: 3, text: "New Task" });
+
+    // Example 2: Immutable Update
+    const safeList = new TodoList([
+      { id: 1, text: "Learn JavaScript" },
+      { id: 2, text: "Build Project" },
+    ]);
+
+    const updatedList = safeList.addItemImmutable({ id: 3, text: "New Task" });
+
+    stateDisplay.innerHTML = `
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h6 class="mb-0">Reference Sharing (Mutable)</h6>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <h6>Original State:</h6>
+            <pre class="code-block"><code>${JSON.stringify(
+              originalState,
+              null,
+              2
+            )}</code></pre>
+          </div>
+          <div class="col-md-4">
+            <h6>After Mutation:</h6>
+            <pre class="code-block"><code>${JSON.stringify(
+              originalList.items,
+              null,
+              2
+            )}</code></pre>
+          </div>
+          <div class="col-md-4">
+            <h6>Shallow Copy:</h6>
+            <pre class="code-block"><code>${JSON.stringify(
+              shallowCopy,
+              null,
+              2
+            )}</code></pre>
+          </div>
+        </div>
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle"></i>Notice: Both arrays changed because they share the same reference!
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        <h6 class="mb-0">Immutable Update</h6>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <h6>Original List:</h6>
+            <pre class="code-block"><code>${JSON.stringify(
+              safeList.items,
+              null,
+              2
+            )}</code></pre>
+          </div>
+          <div class="col-md-6">
+            <h6>Updated List:</h6>
+            <pre class="code-block"><code>${JSON.stringify(
+              updatedList.items,
+              null,
+              2
+            )}</code></pre>
+          </div>
+        </div>
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle"></i>Notice: Original list remains unchanged while new list contains the added item!
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h6 class="mb-0">Key Takeaways</h6>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <i class="bi bi-arrow-right"></i>Direct array/object mutations affect all references
+          </li>
+          <li class="list-group-item">
+            <i class="bi bi-arrow-right"></i>Use spread operator or Object.assign() for shallow copies
+          </li>
+          <li class="list-group-item">
+            <i class="bi bi-arrow-right"></i>Return new objects instead of mutating existing ones
+          </li>
+          <li class="list-group-item">
+            <i class="bi bi-arrow-right"></i>Consider using immutable data structures for complex state
+          </li>
+        </ul>
+      </div>
+    </div>
+  `;
+  });
+
+  // Async Error Demo
+  const asyncButton = document.getElementById("asyncButton");
+  const asyncResult = document.getElementById("asyncResult");
+  const asyncError = document.getElementById("asyncError");
+
+  // Simulate API calls with different outcomes
+  async function fetchUserDate(shouldFail = false) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (shouldFail) throw new Error("Network error: Failed to fetch user data");
+    return { id: 1, name: "John Doe" };
+  }
+
+  async function processUserData(data, shouldFail = false) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (shouldFail) throw new Error("Processing error: Invalid data format");
+    return `Processed ${data.name}'s information`;
+  }
+
+  asyncButton.addEventListener("click", async () => {
+    // Reset display state
+    asyncResult.classList.add("d-none");
+    asyncError.classList.add("d-none");
+    asyncButton.disabled = true;
+
+    try {
+      // First attempt - will fail
+      const userData = await fetchUserDate(true);
+      const processed = await processUserData(userData);
+      asyncResult.textContent = processed;
+      asyncResult.classList.remove("d-none");
+    } catch (error) {
+      asyncError.innerHTML = `
+  <strong>Original Error:</strong> ${error.message}<br>
+  <small class="text-muted">Stack trace: ${error.stack
+    .split("\n")
+    .join("<br>")}</small>
+`;
+      asyncError.classList.remove("d-none");
+
+      // Recovery attempt
+      try {
+        const userData = await fetchUserDate(false);
+        const processed = await processUserData(userData);
+        asyncResult.textContent = `Recovery successful: ${processed}`;
+        asyncResult.classList.remove("d-none");
+      } catch (error) {
+        asyncError.textContent += "\nRecovery attempt also failed!";
+      }
+    } finally {
+      asyncButton.disabled = false;
+    }
+  });
+
+  // Update progress as user scrolls through sections
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          updateProgress(entry.target.id);
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  document.querySelectorAll("section[id]").forEach((section) => {
+    observer.observe(section);
+  });
+
+  function updateProgress(sectionId) {
+    const progressBar = document.querySelector(".progress-bar");
+    const SECTIONS = Object.freeze({
+      TYPE_COERCION: "type-coercion",
+      MUTABLE_STATE: "mutable-state",
+      ASYNC_ERROR: "async-error",
+    });
+    const currentIndex = sections.indexOf(sectionId);
+    const progress = ((currentIndex + 1) / sections.length) * 100;
+
+    progressBar.style.width = `${progress}%`;
+    progressBar.setAttribute("aria-valuenow", progress);
+    progressBar.textContent = `${currentIndex + 1}/${SECTIONS.length}`;
+  }
 });

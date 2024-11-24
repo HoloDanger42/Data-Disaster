@@ -3,6 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Learn about common JavaScript data handling pitfalls"
+    />
+    <meta
+      name="keywords"
+      content="JavaScript, programming, type coercion, async"
+    />
     <title>Data Disasters</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -21,7 +29,22 @@
       </div>
     </nav>
 
-    <main class="container">
+    <div class="progress-container">
+      <div class="progress">
+        <div
+          class="progress-bar"
+          role="progressbar"
+          style="width: 33%"
+          aria-valuenow="33"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          1/3
+        </div>
+      </div>
+    </div>
+
+    <main id="main-content" class="container">
       <!-- Type Coercion Section -->
       <section id="type-coercion" class="mb-5">
         <h2 class="section-title">1. Type Coercion: Unexpected Results</h2>
@@ -34,7 +57,11 @@
               </p>
             </div>
 
-            <div class="code-example mb-4">
+            <div
+              class="code-example mb-4"
+              role="region"
+              aria-label="Code example"
+            >
               <h5>Example Code:</h5>
               <pre><code class="language-javascript">  // Loose vs Strict Equality
   console.log(5 == "5");   // true
@@ -55,7 +82,13 @@
                     id="coercionInput1"
                     aria-label="First value for comparison"
                     placeholder="Enter first value (e.g., 5)"
+                    aria-describedby="coercionInput1Help"
+                    required
                   />
+                  <div id="coercionInput1Help" class="form-text">
+                    Enter any value to compare
+                  </div>
+                  <div class="invalid-feedback">Please enter a value</div>
                 </div>
                 <div class="mb-3">
                   <label for="coercionInput2" class="form-label"
@@ -153,7 +186,11 @@
               </p>
             </div>
 
-            <div class="code-example mb-4">
+            <div
+              class="code-example mb-4"
+              role="region"
+              aria-label="Code example"
+            >
               <h5>Example Code:</h5>
               <pre><code class="language-javascript">  const originalArray = [1, 2, 3];
   const copy = originalArray;
@@ -193,7 +230,11 @@
               </p>
             </div>
 
-            <div class="code-example mb-4">
+            <div
+              class="code-example mb-4"
+              role="region"
+              aria-label="Code example"
+            >
               <h5>Example Code:</h5>
               <pre><code class="language-javascript">  async function riskyOperation() {
     throw new Error('Something went wrong');
@@ -227,12 +268,20 @@
       </section>
     </main>
 
+    <footer class="bg-dark text-light py-4 mt-5">
+      <div class="container">
+        <p class="mb-0">
+          Data Disasters - Learn JavaScript pitfalls interactively
+        </p>
+      </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <script>
       Prism.highlightAll();
     </script>
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
   </body>
 </html>
