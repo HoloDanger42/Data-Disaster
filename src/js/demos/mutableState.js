@@ -15,8 +15,10 @@ export class MutableStateDemo {
   }
 
   initElements() {
-    this.button = this.getElement("mutableButton");
-    this.display = this.getElement("stateDisplay");
+    this.button = document.getElementById("mutableButton");
+    this.result = document.getElementById("mutableResult");
+    this.arrayInput = document.getElementById("arrayInput");
+    this.newItemInput = document.getElementById("newItemInput");
   }
 
   getElement(id) {
@@ -52,9 +54,11 @@ export class MutableStateDemo {
   handleMutation() {
     try {
       this.setLoading(true);
-      const { originalState, mutatedState, immutableState } =
-        this.demonstrateMutation();
-      this.displayResults(originalState, mutatedState, immutableState);
+      const initialArray = JSON.parse(this.arrayInput.value || '[1, 2, 3]');
+      const newItem = JSON.parse(this.newItemInput.value || '4');
+      
+      const results = this.demonstrateMutation(initialArray, newItem);
+      this.displayResults(results);
     } catch (error) {
       this.handleError(error);
     } finally {
@@ -66,29 +70,22 @@ export class MutableStateDemo {
    * Demonstrates mutable vs immutable array operations
    * @returns {Object} State objects showing mutation effects
    */
-  demonstrateMutation() {
-    const originalList = new TodoList([
-      { id: 1, text: "Learn JavaScript" },
-      { id: 2, text: "Build Project" },
-    ]);
+  demonstrateMutation(initialArray, newItem) {
+    // Mutable approach
+    const shallowCopy = [...initialArray];
+    shallowCopy.push(newItem);
 
-    const originalState = JSON.stringify(originalList.items, null, 2);
-    const shallowCopy = originalList.items;
-    shallowCopy.push({ id: 3, text: "New Task" });
-
-    const safeList = new TodoList([...originalList.items]);
-    const updatedList = safeList.addItemImmutable({
-      id: 4,
-      text: "Another Task",
-    });
+    // Immutable approach
+    const safeCopy = [...initialArray];
+    const newArray = [...safeCopy, newItem];
 
     return {
-      originalState,
-      mutatedState: JSON.stringify(originalList.items, null, 2),
-      immutableState: {
-        original: JSON.stringify(safeList.items, null, 2),
-        updated: JSON.stringify(updatedList.items, null, 2),
-      },
+      original: initialArray,
+      mutable: shallowCopy,
+      immutable: {
+        original: safeCopy,
+        new: newArray
+      }
     };
   }
 
@@ -98,77 +95,44 @@ export class MutableStateDemo {
    * @param {string} mutatedState - State after mutation
    * @param {Object} immutableState - States from immutable updates
    */
-  displayResults(originalState, mutatedState, immutableState) {
+  displayResults({ original, mutable, immutable }) {
     const html = `
-    <div class="card mb-4">
-      <div class="card-header bg-warning text-dark">
-        <h6 class="mb-0">Reference Sharing (Mutable)</h6>
-      </div>
-      <div class="card-body">
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <h6>Original State:</h6>
-            <pre class="code-block"><code>${originalState}</code></pre>
-          </div>
-          <div class="col-md-4">
-            <h6>After Mutation:</h6>
-            <pre class="code-block"><code>${mutatedState}</code></pre>
-          </div>
-          <div class="col-md-4">
-            <h6>Shallow Copy:</h6>
-            <pre class="code-block"><code>${mutatedState}</code></pre>
-          </div>
-        </div>
-        <div class="alert alert-warning">
-          <i class="bi bi-exclamation-triangle"></i> Notice: Both arrays changed because they share the same reference!
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-4">
-      <div class="card-header bg-success text-white">
-        <h6 class="mb-0">Immutable Update</h6>
-      </div>
-      <div class="card-body">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h6>Original List:</h6>
-            <pre class="code-block"><code>${immutableState.original}</code></pre>
-          </div>
-          <div class="col-md-6">
-            <h6>Updated List:</h6>
-            <pre class="code-block"><code>${immutableState.updated}</code></pre>
-          </div>
-        </div>
-        <div class="alert alert-success">
-          <i class="bi bi-check-circle"></i> Notice: Original list remains unchanged while new list contains the added item!
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header bg-info text-white">
-        <h6 class="mb-0">Key Takeaways</h6>
-      </div>
-      <div class="card-body">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <i class="bi bi-arrow-right"></i> Direct array/object mutations affect all references
-          </li>
-          <li class="list-group-item">
-            <i class="bi bi-arrow-right"></i> Use spread operator or Object.assign() for shallow copies
-          </li>
-          <li class="list-group-item">
-            <i class="bi bi-arrow-right"></i> Return new objects instead of mutating existing ones
-          </li>
-          <li class="list-group-item">
-            <i class="bi bi-arrow-right"></i> Consider using immutable data structures for complex state
-          </li>
+      <h5>Mutation Comparison:</h5>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Operation</th>
+            <th>Original Array</th>
+            <th>Result Array</th>
+            <th>Side Effects</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table-danger">
+            <td><code>Mutable Update</code></td>
+            <td>${JSON.stringify(original)}</td>
+            <td>${JSON.stringify(mutable)}</td>
+            <td>Original array modified</td>
+          </tr>
+          <tr class="table-success">
+            <td><code>Immutable Update</code></td>
+            <td>${JSON.stringify(immutable.original)}</td>
+            <td>${JSON.stringify(immutable.new)}</td>
+            <td>Original array preserved</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alert alert-info mt-3">
+        <h6>Key Takeaways:</h6>
+        <ul>
+          <li>Mutable operations modify the original array</li>
+          <li>Immutable operations create new arrays</li>
+          <li>Use spread operator [...] for safe copies</li>
+          <li>Return new arrays instead of modifying existing ones</li>
         </ul>
-      </div>
-    </div>`;
+      </div>`;
 
-    this.display.innerHTML = html;
+    this.result.innerHTML = html;
   }
 
   destroy() {

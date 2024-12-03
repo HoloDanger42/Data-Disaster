@@ -1,0 +1,29 @@
+{
+  "name": "data-disasters",
+  "version": "1.0.0",
+  "main": "src/js/main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ]
+  },
+  "description": "JavaScript pitfalls demo",
+  "dependencies": {
+    "data-disasters": "file:"
+  }
+}

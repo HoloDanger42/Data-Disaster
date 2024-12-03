@@ -77,8 +77,9 @@ export class ArithmeticCoercionDemo {
       this.setLoading(true);
       const val1 = this.validateNumber(this.input1.value);
       const val2 = this.validateNumber(this.input2.value);
+      const op = this.operator.value;
 
-      const results = this.performCalculation(val1, val2);
+      const results = this.performCalculation(val1, val2, op);
       this.displayResults(results);
     } catch (error) {
       this.handleError(error);
@@ -87,40 +88,46 @@ export class ArithmeticCoercionDemo {
     }
   }
 
-  performCalculation(val1, val2) {
+  performCalculation(val1, val2, op = "+") {
     try {
       const num1 = Number(val1);
       const num2 = Number(val2);
-      const op = this.operator.value;
 
-      const nonCoerced = eval(`"${val1}" ${op} "${val2}"`);
+      // Validate operator
+      if (!["+", "-", "*", "/"].includes(op)) {
+        throw new Error("Invalid operator");
+      }
+
+      let nonCoerced;
+      // Handle string operations differently based on operator
+      if (op === "+") {
+        nonCoerced = `${val1}${val2}`; // String concatenation
+      } else {
+        nonCoerced = String(val1) + op + String(val2); // Show expression
+      }
+
       let coerced;
-
-      try {
-        switch (op) {
-          case "+":
-            coerced = num1 + num2;
-            break;
-          case "-":
-            coerced = num1 - num2;
-            break;
-          case "*":
-            coerced = num1 * num2;
-            break;
-          case "/":
-            coerced = num2 === 0 ? Infinity : num1 / num2;
-            break;
-          default:
-            throw new Error("Invalid operator");
-        }
-      } catch (error) {
-        coerced = `Error: ${error.message}`;
+      switch (op) {
+        case "+":
+          coerced = num1 + num2;
+          break;
+        case "-":
+          coerced = num1 - num2;
+          break;
+        case "*":
+          coerced = num1 * num2;
+          break;
+        case "/":
+          coerced = num2 === 0 ? Infinity : num1 / num2;
+          break;
+        default:
+          throw new Error("Invalid operator");
       }
 
       return { val1, val2, op, nonCoerced, coerced };
     } catch (error) {
       console.error("Calculation error:", error);
-      throw new Error("Failed to perform calculation");
+      throw error;
     }
   }
 
