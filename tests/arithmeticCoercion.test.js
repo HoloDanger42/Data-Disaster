@@ -5,64 +5,76 @@ describe("ArithmeticCoercionDemo", () => {
   let demo;
   let mockElements;
 
-  beforeEach(() => {
-    // Setup DOM elements
-    document.body.innerHTML = `
-      <form id="arithmeticForm">
-        <div id="arithmeticResult"></div>
-        <input id="arithmeticInput1" />
-        <input id="arithmeticInput2" />
-        <select id="arithmeticOperator">
-          <option value="+">+</option>
-          <option value="-">-</option>
-          <option value="*">*</option>
-          <option value="/">/</option>
-        </select>
-        <button id="arithmeticButton">Calculate</button>
-      </form>
-    `;
-
-    // Store references to elements
-    mockElements = {
-      form: document.getElementById("arithmeticForm"),
-      result: document.getElementById("arithmeticResult"),
-      input1: document.getElementById("arithmeticInput1"),
-      input2: document.getElementById("arithmeticInput2"),
-      operator: document.getElementById("arithmeticOperator"),
-      button: document.getElementById("arithmeticButton"),
-    };
-
-    // Create spy on getElementById
-    const getElementByIdSpy = jest.spyOn(document, "getElementById");
-    getElementByIdSpy.mockImplementation((id) => {
-      if (id === "arithmeticForm") return mockElements.form;
-      const key = id.replace("arithmetic", "").toLowerCase();
-      return mockElements[key] || null;
-    });
-
-    demo = new ArithmeticCoercionDemo();
-  });
-
   afterEach(() => {
+    if (demo) {
+      demo.destroy();
+      demo = null;
+    }
     document.body.innerHTML = "";
     jest.restoreAllMocks();
-    demo.destroy();
   });
 
   describe("initialization", () => {
     test("should initialize successfully with all required elements", () => {
+      // Set up DOM
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+
+      // Initialize demo
+      demo = new ArithmeticCoercionDemo();
       expect(demo.form).toBeTruthy();
       expect(demo.result).toBeTruthy();
       expect(demo.button).toBeTruthy();
     });
 
     test("should throw error if form not found", () => {
-      document.getElementById.mockImplementation(() => null);
-      expect(() => new ArithmeticCoercionDemo()).toThrow();
+      // Suppress console.error during this test
+      const consoleErrorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      // Clear DOM to simulate missing form
+      document.body.innerHTML = "";
+
+      // Initialize demo and expect error
+      expect(() => {
+        new ArithmeticCoercionDemo();
+      }).toThrow(/ArithmeticCoercionDemo initialization failed/);
+
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
     });
   });
 
   describe("input validation", () => {
+    beforeEach(() => {
+      // Set up DOM
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+      demo = new ArithmeticCoercionDemo();
+    });
+
     test("should validate numerical input", () => {
       expect(() => demo.validateNumber("")).toThrow("Input value is required");
       expect(() => demo.validateNumber("abc")).toThrow(
@@ -74,38 +86,73 @@ describe("ArithmeticCoercionDemo", () => {
   });
 
   describe("calculations", () => {
+    beforeEach(() => {
+      // Set up DOM
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+      demo = new ArithmeticCoercionDemo();
+    });
+
     test("should perform addition with type coercion", () => {
-      mockElements.operator.value = "+";
       const result = demo.performCalculation("5", "3", "+");
       expect(result).toEqual({
         val1: "5",
         val2: "3",
         op: "+",
-        nonCoerced: "53", // String concatenation
-        coerced: 8, // Numeric addition
+        nonCoerced: "53",
+        coerced: 8,
       });
     });
 
     test("should perform multiplication with type coercion", () => {
-      mockElements.operator.value = "*";
       const result = demo.performCalculation("5", "3", "*");
       expect(result).toEqual({
         val1: "5",
         val2: "3",
         op: "*",
-        nonCoerced: "5*3", // Show expression instead of attempting string multiplication
-        coerced: 15, // Numeric multiplication
+        nonCoerced: "5*3",
+        coerced: 15,
       });
     });
 
     test("should handle division by zero", () => {
-      mockElements.operator.value = "/";
       const result = demo.performCalculation("5", "0", "/");
       expect(result.coerced).toBe(Infinity);
     });
   });
 
   describe("display", () => {
+    beforeEach(() => {
+      // Set up DOM with all required elements
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+      demo = new ArithmeticCoercionDemo();
+    });
+
     test("should generate explanation for different operators", () => {
       const explanation = demo.getExplanation("+", "53", 8);
       expect(explanation).toContain("Type Coercion Explanation");
@@ -114,13 +161,40 @@ describe("ArithmeticCoercionDemo", () => {
   });
 
   describe("cleanup", () => {
+    beforeEach(() => {
+      // Set up DOM with all required elements
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+      demo = new ArithmeticCoercionDemo();
+    });
+
     test("should remove event listeners and clear references", () => {
-      const removeEventListener = jest.spyOn(
+      // Capture handleClick before destroying
+      const handleClick = demo.handleClick;
+
+      // Spy on removeEventListener
+      const removeEventListenerSpy = jest.spyOn(
         demo.button,
         "removeEventListener"
       );
+
+      // Call destroy method
       demo.destroy();
-      expect(removeEventListener).toHaveBeenCalled();
+
+      // Assert removeEventListener was called with correct arguments
+      expect(removeEventListenerSpy).toHaveBeenCalledWith("click", handleClick);
       expect(demo.button).toBeNull();
       expect(demo.form).toBeNull();
     });
