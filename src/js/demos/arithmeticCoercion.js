@@ -22,6 +22,27 @@ export class ArithmeticCoercionDemo {
     this.button = document.getElementById("arithmeticButton");
 
     if (!this.form) throw new Error("Arithmetic form not found");
+
+    // Add accessibility attributes
+    this.form.setAttribute(
+      "aria-label",
+      "Arithmetic type coercion demonstration"
+    );
+    this.result.setAttribute("role", "region");
+    this.result.setAttribute("aria-live", "polite");
+    this.result.setAttribute("aria-atomic", "true");
+
+    // Add descriptive labels
+    this.input1.setAttribute("aria-describedby", "arithmeticInput1Help");
+    this.input2.setAttribute("aria-describedby", "arithmeticInput2Help");
+    this.operator.setAttribute("aria-label", "Arithmetic operator");
+
+    // Add keyboard support for button
+    this.button.setAttribute("role", "button");
+    this.button.setAttribute(
+      "aria-label",
+      "Calculate and demonstrate type coercion"
+    );
   }
 
   bindEvents() {

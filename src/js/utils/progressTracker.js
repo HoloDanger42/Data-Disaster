@@ -34,7 +34,7 @@ export class ProgressTracker {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.2, rootMargin: "0px 0px -20% 0px" }
     );
 
     document.querySelectorAll("section[id]").forEach((section) => {

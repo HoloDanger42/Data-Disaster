@@ -19,6 +19,22 @@ export class TypeCoercionDemo {
     this.result = document.getElementById("coercionResult");
     this.input1 = document.getElementById("coercionInput1");
     this.input2 = document.getElementById("coercionInput2");
+
+    // Add accessibility attributes
+    this.result.setAttribute("role", "region");
+    this.result.setAttribute("aria-live", "polite");
+    this.result.setAttribute("aria-atomic", "true");
+
+    // Add descriptive labels
+    this.input1.setAttribute("aria-describedby", "coercionInput1Help");
+    this.input2.setAttribute("aria-describedby", "coercionInput2Help");
+
+    // Add button accessibility
+    this.button.setAttribute("role", "button");
+    this.button.setAttribute(
+      "aria-label",
+      "Compare values and demonstrate type coercion"
+    );
   }
 
   getElement(id) {
@@ -59,15 +75,17 @@ export class TypeCoercionDemo {
 
   handleComparison() {
     try {
+      this.setLoading(true);
+
       const val1 = this.parseValue(this.validateInput(this.input1.value));
-      const val2 = this.parseValue(
-        this.validateInput(this.validateInput(this.input2.value))
-      );
+      const val2 = this.parseValue(this.validateInput(this.input2.value));
 
       const results = this.compareValues(val1, val2);
       this.displayResults(results);
     } catch (error) {
       this.handleError(error);
+    } finally {
+      this.setLoading(false);
     }
   }
 
@@ -149,10 +167,13 @@ export class TypeCoercionDemo {
   }
 
   destroy() {
-    this.button.removeEventListener("click", this.handleComparisonBound);
+    if (this.button && this.handleComparisonBound) {
+      this.button.removeEventListener("click", this.handleComparisonBound);
+    }
     this.button = null;
     this.result = null;
     this.input1 = null;
     this.input2 = null;
+    this.handleComparisonBound = null;
   }
 }

@@ -17,6 +17,12 @@ export class GlobalScopeDemo {
   initElements() {
     this.button = document.getElementById("globalScopeButton");
     this.result = document.getElementById("globalScopeResult");
+
+    // Add accessibility
+    this.result.setAttribute("role", "region");
+    this.result.setAttribute("aria-live", "polite");
+    this.result.setAttribute("aria-atomic", "true");
+    this.button.setAttribute("aria-label", "Demonstrate scope behavior");
   }
 
   bindEvents() {
@@ -134,5 +140,6 @@ export class GlobalScopeDemo {
     }
     this.button = null;
     this.result = null;
+    this.handleDemoBound = null;
   }
 }

@@ -19,6 +19,24 @@ export class MutableStateDemo {
     this.result = document.getElementById("mutableResult");
     this.arrayInput = document.getElementById("arrayInput");
     this.newItemInput = document.getElementById("newItemInput");
+
+    // Add accessibility attributes
+    this.result.setAttribute("role", "region");
+    this.result.setAttribute("aria-live", "polite");
+    this.result.setAttribute("aria-atomic", "true");
+
+    // Add descriptive labels
+    this.arrayInput.setAttribute("aria-describedby", "arrayInputHelp");
+    this.newItemInput.setAttribute("aria-describedby", "newItemHelp");
+
+    // Add button accessibility
+    this.button.setAttribute("role", "button");
+    this.button.setAttribute(
+      "aria-label",
+      "Demonstrate array mutation effects"
+    );
+
+    this.display = this.result;
   }
 
   getElement(id) {
@@ -54,9 +72,9 @@ export class MutableStateDemo {
   handleMutation() {
     try {
       this.setLoading(true);
-      const initialArray = JSON.parse(this.arrayInput.value || '[1, 2, 3]');
-      const newItem = JSON.parse(this.newItemInput.value || '4');
-      
+      const initialArray = JSON.parse(this.arrayInput.value || "[1, 2, 3]");
+      const newItem = JSON.parse(this.newItemInput.value || "4");
+
       const results = this.demonstrateMutation(initialArray, newItem);
       this.displayResults(results);
     } catch (error) {
@@ -84,8 +102,8 @@ export class MutableStateDemo {
       mutable: shallowCopy,
       immutable: {
         original: safeCopy,
-        new: newArray
-      }
+        new: newArray,
+      },
     };
   }
 
@@ -136,9 +154,17 @@ export class MutableStateDemo {
   }
 
   destroy() {
-    this.button.removeEventListener("click", this.handleMutationBound);
+    if (this.button && this.handleMutationBound) {
+      this.button.removeEventListener("click", this.handleMutationBound);
+    }
+
+    // Clear references
     this.button = null;
+    this.result = null;
+    this.arrayInput = null;
+    this.newItemInput = null;
     this.display = null;
+    this.handleMutationBound = null;
   }
 }
 

@@ -12,14 +12,16 @@ let demos = [];
 document.addEventListener("DOMContentLoaded", () => {
   try {
     // Initialize progress tracker first
-    const progressTracker = new ProgressTracker([
+    const sections = [
       "type-coercion",
       "mutable-state",
       "async-error",
       "this-keyword",
       "global-scope",
       "callback-hell",
-    ]);
+    ];
+
+    const progressTracker = new ProgressTracker(sections);
 
     // Initialize demos
     demos = [

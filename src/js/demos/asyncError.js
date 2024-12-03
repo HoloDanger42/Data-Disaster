@@ -101,9 +101,12 @@ export class AsyncErrorDemo {
   }
 
   destroy() {
-    this.button.removeEventListener("click", this.handleOperationBound);
+    if (this.button && this.handleOperationBound) {
+      this.button.removeEventListener("click", this.handleOperationBound);
+    }
     this.button = null;
     this.result = null;
     this.error = null;
+    this.handleOperationBound = null;
   }
 }

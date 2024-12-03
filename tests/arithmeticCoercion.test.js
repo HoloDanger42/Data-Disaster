@@ -131,6 +131,32 @@ describe("ArithmeticCoercionDemo", () => {
       const result = demo.performCalculation("5", "0", "/");
       expect(result.coerced).toBe(Infinity);
     });
+
+    // Add missing operator tests
+    test("should perform subtraction with type coercion", () => {
+      const result = demo.performCalculation("5", "3", "-");
+      expect(result).toEqual({
+        val1: "5",
+        val2: "3",
+        op: "-",
+        nonCoerced: "5-3",
+        coerced: 2,
+      });
+    });
+
+    test("should throw error for invalid operator", () => {
+      // Suppress console.error for this test
+      const consoleErrorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      expect(() => demo.performCalculation("5", "3", "%")).toThrow(
+        "Invalid operator"
+      );
+
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   describe("display", () => {
@@ -197,6 +223,65 @@ describe("ArithmeticCoercionDemo", () => {
       expect(removeEventListenerSpy).toHaveBeenCalledWith("click", handleClick);
       expect(demo.button).toBeNull();
       expect(demo.form).toBeNull();
+    });
+  });
+
+  describe("error handling", () => {
+    beforeEach(() => {
+      // Set up DOM with required elements
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+      demo = new ArithmeticCoercionDemo();
+    });
+
+    test("should display error message when calculation fails", () => {
+      demo.handleError(new Error("Test error"));
+      expect(demo.result.innerHTML).toContain("Test error");
+    });
+
+    test("should sanitize HTML in error messages", () => {
+      const xss = "<script>alert('xss')</script>";
+      const sanitized = demo.sanitizeHTML(xss);
+      expect(sanitized).not.toContain("<script>");
+      expect(sanitized).toContain("&lt;script&gt;");
+    });
+  });
+
+  describe("loading state", () => {
+    beforeEach(() => {
+      // Set up DOM with required elements
+      document.body.innerHTML = `
+        <form id="arithmeticForm">
+          <div id="arithmeticResult"></div>
+          <input id="arithmeticInput1" />
+          <input id="arithmeticInput2" />
+          <select id="arithmeticOperator">
+            <option value="+">+</option>
+          </select>
+          <button id="arithmeticButton">Calculate</button>
+        </form>
+      `;
+      demo = new ArithmeticCoercionDemo();
+    });
+
+    test("should update button state while loading", () => {
+      demo.setLoading(true);
+      expect(demo.button.disabled).toBe(true);
+      expect(demo.button.innerHTML).toContain("spinner-border");
+      expect(demo.button.innerHTML).toContain("Processing...");
+
+      demo.setLoading(false);
+      expect(demo.button.disabled).toBe(false);
+      expect(demo.button.innerHTML).toBe("Calculate");
     });
   });
 });
