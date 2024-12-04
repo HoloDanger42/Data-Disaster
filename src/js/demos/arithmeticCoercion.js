@@ -79,25 +79,16 @@ export class ArithmeticCoercionDemo {
     return div.innerHTML;
   }
 
-  validateNumber(value) {
+  validateInput(value) {
     if (!value) throw new Error("Input value is required");
-    if (!/^-?\d*\.?\d*$/.test(value.trim())) {
-      throw new Error("Please enter a valid number");
-    }
-    return value;
-  }
-
-  getElement(id) {
-    const element = document.getElementById(id);
-    if (!element) throw new Error(`Element with id "${id}" not found`);
-    return element;
+    return value.trim();
   }
 
   handleCalculation() {
     try {
       this.setLoading(true);
-      const val1 = this.validateNumber(this.input1.value);
-      const val2 = this.validateNumber(this.input2.value);
+      const val1 = this.validateInput(this.input1.value);
+      const val2 = this.validateInput(this.input2.value);
       const op = this.operator.value;
 
       const results = this.performCalculation(val1, val2, op);
@@ -111,8 +102,23 @@ export class ArithmeticCoercionDemo {
 
   performCalculation(val1, val2, op = "+") {
     try {
-      const num1 = Number(val1);
-      const num2 = Number(val2);
+      // Clean strings and handle booleans
+      const str1 = val1.replace(/^"|"$/g, "");
+      const str2 = val2.replace(/^"|"$/g, "");
+
+      // Special handling for boolean values
+      const num1 =
+        str1.toLowerCase() === "true"
+          ? 1
+          : str1.toLowerCase() === "false"
+          ? 0
+          : Number(str1);
+      const num2 =
+        str2.toLowerCase() === "true"
+          ? 1
+          : str2.toLowerCase() === "false"
+          ? 0
+          : Number(str2);
 
       // Validate operator
       if (!["+", "-", "*", "/"].includes(op)) {
@@ -122,9 +128,9 @@ export class ArithmeticCoercionDemo {
       let nonCoerced;
       // Handle string operations differently based on operator
       if (op === "+") {
-        nonCoerced = `${val1}${val2}`; // String concatenation
+        nonCoerced = str1 + str2; // String concatenation
       } else {
-        nonCoerced = String(val1) + op + String(val2); // Show expression
+        nonCoerced = str1 + op + str2; // Show expression
       }
 
       let coerced;
@@ -145,7 +151,7 @@ export class ArithmeticCoercionDemo {
           throw new Error("Invalid operator");
       }
 
-      return { val1, val2, op, nonCoerced, coerced };
+      return { val1: str1, val2: str2, op, nonCoerced, coerced };
     } catch (error) {
       console.error("Calculation error:", error);
       throw error;
@@ -153,6 +159,14 @@ export class ArithmeticCoercionDemo {
   }
 
   displayResults({ val1, val2, op, nonCoerced, coerced }) {
+    const getNumberValue = (str) => {
+      return str.toLowerCase() === "true"
+        ? 1
+        : str.toLowerCase() === "false"
+        ? 0
+        : Number(str);
+    };
+
     const html = `
       <h5>Type Coercion Demonstration:</h5>
       <table class="table table-bordered">
@@ -173,7 +187,9 @@ export class ArithmeticCoercionDemo {
           </tr>
           <tr class="table-info">
             <td>After Number() Conversion</td>
-            <td><code>${Number(val1)} ${op} ${Number(val2)}</code></td>
+            <td><code>${getNumberValue(val1)} ${op} ${getNumberValue(
+      val2
+    )}</code></td>
             <td>${coerced}</td>
             <td><span class="badge bg-primary">${typeof coerced}</span></td>
           </tr>
@@ -212,6 +228,5 @@ export class ArithmeticCoercionDemo {
     this.input1 = null;
     this.input2 = null;
     this.operator = null;
-    this.handleSubmit = null;
   }
 }

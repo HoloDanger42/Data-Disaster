@@ -58,33 +58,6 @@ describe("ArithmeticCoercionDemo", () => {
     });
   });
 
-  describe("input validation", () => {
-    beforeEach(() => {
-      // Set up DOM
-      document.body.innerHTML = `
-        <form id="arithmeticForm">
-          <div id="arithmeticResult"></div>
-          <input id="arithmeticInput1" />
-          <input id="arithmeticInput2" />
-          <select id="arithmeticOperator">
-            <option value="+">+</option>
-          </select>
-          <button id="arithmeticButton">Calculate</button>
-        </form>
-      `;
-      demo = new ArithmeticCoercionDemo();
-    });
-
-    test("should validate numerical input", () => {
-      expect(() => demo.validateNumber("")).toThrow("Input value is required");
-      expect(() => demo.validateNumber("abc")).toThrow(
-        "Please enter a valid number"
-      );
-      expect(demo.validateNumber("123")).toBe("123");
-      expect(demo.validateNumber("-12.34")).toBe("-12.34");
-    });
-  });
-
   describe("calculations", () => {
     beforeEach(() => {
       // Set up DOM
